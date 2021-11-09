@@ -13,7 +13,7 @@ import pygame.freetype
 import re
 import random
 
-waittime = 1
+waittime = 0.2
 
 
 def draw_board():
@@ -65,15 +65,18 @@ def mainAutoPhase1():
                 if i == 0:
                     cdn = randomPlace()  # using random ai
                 else:
-                    cdn = randomPlace()  # TODO: using algorithm
-                    ai_step(board, True, i + 1, pawnToPlace[2], pawnToPlace[1])
+                    # cdn = randomPlace()  # TODO: using algorithm
+                    # maxing the ai first
+                    # _, cdn, _ = ai_step(
+                    # board, i + 1, pawnToPlace[2], pawnToPlace[1])
+                    cdn = randomPlace()
 
-                if placeable(i, str(cdn)):  # only check if placable
+                if placeable(i, cdn):  # only check if placeable
                     break
 
-            placePawn(i + 1, str(cdn))
+            placePawn(i + 1, cdn)
 
-            if checkMill(i + 1, str(cdn)):  # after placing, check if a mill is formed
+            if checkMill(i + 1, cdn):  # after placing, check if a mill is formed
                 if i == 0:
                     autoDelete(2)  # using random ai
                 else:
@@ -114,13 +117,13 @@ def mainAutoPhase2():
                 else:
                     st, end = randomMove(i + 1)  # TODO: using algorithm
 
-                if movable(i + 1, str(st), str(end)):
+                if movable(i + 1, st, end):
                     break
 
             print(st, end)
-            move(i + 1, str(st), str(end))
+            move(i + 1, st, end)
 
-            if checkMill(i + 1, str(end)):
+            if checkMill(i + 1, end):
                 if i == 0:
                     autoDelete(2)  # using random ai
                 else:
@@ -164,10 +167,10 @@ def mainAutoPhase3(player):
             st, end = randomJump(player)  # using randomness
         else:
             st, end = randomJump(player)  # using algorithm
-        if str(st) in board and str(end) in board and board[st] == player and board[end] == 3:
+        if st in board and end in board and board[st] == player and board[end] == 3:
             break
-    jump(player, str(st), str(end))
-    if checkMill(str(player), str(end)):
+    jump(player, st, end)
+    if checkMill(player, end):
         if player == 1:
             autoDelete(2)  # using randomness
         else:

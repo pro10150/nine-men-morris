@@ -6,62 +6,37 @@ from config import *
 DEBUGPRINT = True
 
 # 3 คือช่องว่าง
-board = {
-    "00": 3,
-    "01": 3,
-    "02": 3,
-    "03": 3,
-    "04": 3,
-    "05": 3,
-    "06": 3,
-    "07": 3,
-    "08": 3,
-    "09": 3,
-    "10": 3,
-    "11": 3,
-    "12": 3,
-    "13": 3,
-    "14": 3,
-    "15": 3,
-    "16": 3,
-    "17": 3,
-    "18": 3,
-    "19": 3,
-    "20": 3,
-    "21": 3,
-    "22": 3,
-    "23": 3
-}
+# board = [3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3] # 24 member of 3 (aka null)
+board = [3] * 24
 
 # พิกัดที่ต่อกัน3ตำแหน่งแล้วจะลบตัวฝั่งตรงข้ามได้
 # first list: vertical mill / second list: horizontal mill
-mill = {
-
-    "00": [[board["09"], board["21"]], [board["01"], board["02"]]],
-    "01": [[board["04"], board["07"]], [board["00"], board["02"]]],
-    "02": [[board["14"], board["23"]], [board["00"], board["01"]]],
-    "03": [[board["10"], board["18"]], [board["04"], board["05"]]],
-    "04": [[board["01"], board["07"]], [board["03"], board["05"]]],
-    "05": [[board["13"], board["20"]], [board["03"], board["04"]]],
-    "06": [[board["11"], board["15"]], [board["07"], board["08"]]],
-    "07": [[board["01"], board["04"]], [board["06"], board["08"]]],
-    "08": [[board["12"], board["17"]], [board["06"], board["07"]]],
-    "09": [[board["00"], board["21"]], [board["10"], board["11"]]],
-    "10": [[board["03"], board["18"]], [board["09"], board["11"]]],
-    "11": [[board["06"], board["15"]], [board["09"], board["10"]]],
-    "12": [[board["08"], board["17"]], [board["13"], board["14"]]],
-    "13": [[board["05"], board["20"]], [board["12"], board["14"]]],
-    "14": [[board["02"], board["23"]], [board["12"], board["13"]]],
-    "15": [[board["06"], board["11"]], [board["16"], board["17"]]],
-    "16": [[board["19"], board["22"]], [board["15"], board["17"]]],
-    "17": [[board["08"], board["12"]], [board["15"], board["16"]]],
-    "18": [[board["03"], board["10"]], [board["19"], board["20"]]],
-    "19": [[board["16"], board["22"]], [board["18"], board["20"]]],
-    "20": [[board["05"], board["13"]], [board["18"], board["19"]]],
-    "21": [[board["00"], board["09"]], [board["22"], board["23"]]],
-    "22": [[board["16"], board["19"]], [board["21"], board["23"]]],
-    "23": [[board["02"], board["14"]], [board["21"], board["22"]]]
-}
+mill = [
+    [[board[9], board[21]], [board[1], board[2]]],
+    [[board[4], board[7]], [board[0], board[2]]],
+    [[board[14], board[23]], [board[0], board[1]]],
+    [[board[10], board[18]], [board[4], board[5]]],
+    [[board[1], board[7]], [board[3], board[5]]],
+    [[board[13], board[20]], [board[3], board[4]]],
+    [[board[11], board[15]], [board[7], board[8]]],
+    [[board[1], board[4]], [board[6], board[8]]],
+    [[board[12], board[17]], [board[6], board[7]]],
+    [[board[0], board[21]], [board[10], board[11]]],
+    [[board[3], board[18]], [board[9], board[11]]],
+    [[board[6], board[15]], [board[9], board[10]]],
+    [[board[8], board[17]], [board[13], board[14]]],
+    [[board[5], board[20]], [board[12], board[14]]],
+    [[board[2], board[23]], [board[12], board[13]]],
+    [[board[6], board[11]], [board[16], board[17]]],
+    [[board[19], board[22]], [board[15], board[17]]],
+    [[board[8], board[12]], [board[15], board[16]]],
+    [[board[3], board[10]], [board[19], board[20]]],
+    [[board[16], board[22]], [board[18], board[20]]],
+    [[board[5], board[13]], [board[18], board[19]]],
+    [[board[0], board[9]], [board[22], board[23]]],
+    [[board[16], board[19]], [board[21], board[23]]],
+    [[board[2], board[14]], [board[21], board[22]]]
+]
 
 # เช็คว่าแต่ละฝั่งมีเบี้ยเหลือเท่าไหร่บ้าง
 playerPawn = {
@@ -85,73 +60,74 @@ endGameFlag = False
 # เช็คว่าผู้เล่นที่1เป็นคนเข้าphase3รึเปล่า
 player1Phase3Flag = False
 
-pawn = ["00", "01", "02", "03", "04", "05", "05", "06", "07", "08", "09", "10", "11", "12", "13", "14", "15", "16",
-        "17", "18", "19", "20", "21", "22", "23"]
+pawn = [0, 1, 2, 3, 4, 5, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16,
+        17, 18, 19, 20, 21, 22, 23]
 
 # ตำแหน่งที่เบี้ยเดินไปได้
-movablePawn = {
+movablePawn = [
 
-    "00": ["09", "01"],
-    "01": ["04", "00", "02"],
-    "02": ["14", "01"],
-    "03": ["10", "04"],
-    "04": ["07", "01", "03", "05"],
-    "05": ["04", "13"],
-    "06": ["11", "07"],
-    "07": ["04", "06", "08"],
-    "08": ["12", "07"],
-    "09": ["21", "00", "10"],
-    "10": ["18", "03", "09", "11"],
-    "11": ["15", "06", "10"],
-    "12": ["17", "08", "13"],
-    "13": ["20", "05", "12", "14"],
-    "14": ["23", "02", "13"],
-    "15": ["11", "16"],
-    "16": ["19", "15", "17"],
-    "17": ["12", "16"],
-    "18": ["10", "19"],
-    "19": ["22", "16", "18", "20"],
-    "20": ["13", "19"],
-    "21": ["09", "22"],
-    "22": ["19", "21", "23"],
-    "23": ["14", "22"]
-}
+    [9, 1],
+    [4, 0, 2],
+    [14, 1],
+    [10, 4],
+    [7, 1, 3, 5],
+    [4, 13],
+    [11, 7],
+    [4, 6, 8],
+    [12, 7],
+    [21, 0, 10],
+    [18, 3, 9, 11],
+    [15, 6, 10],
+    [17, 8, 13],
+    [20, 5, 12, 14],
+    [23, 2, 13],
+    [11, 16],
+    [19, 15, 17],
+    [12, 16],
+    [10, 19],
+    [22, 16, 18, 20],
+    [13, 19],
+    [9, 22],
+    [19, 21, 23],
+    [14, 22]
+]
 
 
 # ฟังก์ชั่นสำหรับอัพเดทตัวในบอร์ดว่ามีตำแหน่งไหนใช้ไปแล้วบ้าง
 def updateMill():
     global mill
-    mill = {
+    mill = [
 
-        "00": [[board["09"], board["21"]], [board["01"], board["02"]]],
-        "01": [[board["04"], board["07"]], [board["00"], board["02"]]],
-        "02": [[board["14"], board["23"]], [board["00"], board["01"]]],
-        "03": [[board["10"], board["18"]], [board["04"], board["05"]]],
-        "04": [[board["01"], board["07"]], [board["03"], board["05"]]],
-        "05": [[board["13"], board["20"]], [board["03"], board["04"]]],
-        "06": [[board["11"], board["15"]], [board["07"], board["08"]]],
-        "07": [[board["01"], board["04"]], [board["06"], board["08"]]],
-        "08": [[board["12"], board["17"]], [board["06"], board["07"]]],
-        "09": [[board["00"], board["21"]], [board["10"], board["11"]]],
-        "10": [[board["03"], board["18"]], [board["09"], board["11"]]],
-        "11": [[board["06"], board["15"]], [board["09"], board["10"]]],
-        "12": [[board["08"], board["17"]], [board["13"], board["14"]]],
-        "13": [[board["05"], board["20"]], [board["12"], board["14"]]],
-        "14": [[board["02"], board["23"]], [board["12"], board["13"]]],
-        "15": [[board["06"], board["11"]], [board["16"], board["17"]]],
-        "16": [[board["19"], board["22"]], [board["15"], board["17"]]],
-        "17": [[board["08"], board["12"]], [board["15"], board["16"]]],
-        "18": [[board["03"], board["10"]], [board["19"], board["20"]]],
-        "19": [[board["16"], board["22"]], [board["18"], board["20"]]],
-        "20": [[board["05"], board["13"]], [board["18"], board["19"]]],
-        "21": [[board["00"], board["09"]], [board["22"], board["23"]]],
-        "22": [[board["16"], board["19"]], [board["21"], board["23"]]],
-        "23": [[board["02"], board["14"]], [board["21"], board["22"]]]
-    }
+        [[board[9], board[21]], [board[1], board[2]]],
+        [[board[4], board[7]], [board[0], board[2]]],
+        [[board[14], board[23]], [board[0], board[1]]],
+        [[board[10], board[18]], [board[4], board[5]]],
+        [[board[1], board[7]], [board[3], board[5]]],
+        [[board[13], board[20]], [board[3], board[4]]],
+        [[board[11], board[15]], [board[7], board[8]]],
+        [[board[1], board[4]], [board[6], board[8]]],
+        [[board[12], board[17]], [board[6], board[7]]],
+        [[board[0], board[21]], [board[10], board[11]]],
+        [[board[3], board[18]], [board[9], board[11]]],
+        [[board[6], board[15]], [board[9], board[10]]],
+        [[board[8], board[17]], [board[13], board[14]]],
+        [[board[5], board[20]], [board[12], board[14]]],
+        [[board[2], board[23]], [board[12], board[13]]],
+        [[board[6], board[11]], [board[16], board[17]]],
+        [[board[19], board[22]], [board[15], board[17]]],
+        [[board[8], board[12]], [board[15], board[16]]],
+        [[board[3], board[10]], [board[19], board[20]]],
+        [[board[16], board[22]], [board[18], board[20]]],
+        [[board[5], board[13]], [board[18], board[19]]],
+        [[board[0], board[9]], [board[22], board[23]]],
+        [[board[16], board[19]], [board[21], board[23]]],
+        [[board[2], board[14]], [board[21], board[22]]]
+    ]
 
 
 # เช็คว่าตำแหน่งที่เราลงไปเรียง3ตัวรึยัง
 def checkMill(player, cdn):
+
     if mill[cdn][0].count(player) == 2 or mill[cdn][1].count(player) == 2:
         return True
     else:
@@ -210,8 +186,8 @@ def delete(i):
     print("You connected 3 straight point and can remove one of oppoents pawn!")
     while (True):
         cdn = input("Please input opponent's pawn cdn: ")
-        if str(cdn) in board and board[cdn] == i:
-            deletePawn(str(i), str(cdn))
+        if cdn in board and board[cdn] == i:
+            deletePawn(i, cdn)
             break
         else:
             print("Invalid cdn. Please use another cdn")
@@ -248,23 +224,26 @@ def autoDelete(player):
 
 
 def randomPlace():
-    return random.choice(list(board))
+    c = random.randrange(0, 24)
+    print('landing on ' + str(c))
+
+    return c
 
 
 def randomMove(player):
     while (True):
-        a = random.choice(list(board))
+        a = random.randrange(0, 24)
         if board[a] == player:
-            b = random.choice(list(movablePawn[a]))
+            b = random.choice(movablePawn[a])
             break
     return a, b
 
 
 def randomJump(player):
     while (True):
-        a = random.choice(list(board))
+        a = random.randrange(0, 24)
         if board[a] == player:
-            b = random.choice(list(board))
+            b = random.randrange(0, 24)
             if board[b] == 3:
                 break
 
@@ -304,218 +283,220 @@ def jumpable(player, st, end):
 
 
 def updateCurrentBoardPosition():
+    i = 0
     for x in board:
-        CURRENTBOARDPOSITION[POSITION[x][0]][POSITION[x][1]] = board[x]
+        CURRENTBOARDPOSITION[POSITION[i][0]][POSITION[i][1]] = board[i]
+        i += 1
 
 # วาดกระดานออกมา
 
 
-def boardOutput(board):
-    print(
-        str(board['00']) + "(00)----------------------" + str(board['01']) + "(01)----------------------" + str(board['02']) + "(02)")
-    print("|                           |                           |")
-    print("|       " + str(board['03']) + "(03)--------------" + str(board['04']) + "(04)--------------" + str(board[
-        '05']) + "(05)     |")
-    print("|       |                   |                    |      |")
-    print("|       |                   |                    |      |")
-    print("|       |        " + str(board['06']) + "(06)-----" + str(board['07']) + "(07)-----" + str(board[
-        '08']) + "(08)       |      |")
-    print("|       |         |                   |          |      |")
-    print("|       |         |                   |          |      |")
-    print(str(board['09']) + "(09)---" + str(board['10']) + "(10)----" + str(board['11']) + "(11)               " + str(board[
-        '12']) + "(12)----" + str(board['13']) + "(13)---" + str(board['14']) + "(14)")
-    print("|       |         |                   |          |      |")
-    print("|       |         |                   |          |      |")
-    print("|       |        " + str(board['15']) + "(15)-----" + str(board['16']) + "(16)-----" + str(board[
-        '17']) + "(17)       |      |")
-    print("|       |                   |                    |      |")
-    print("|       |                   |                    |      |")
-    print("|       " + str(board['18']) + "(18)--------------" + str(board['19']) + "(19)--------------" + str(board[
-        '20']) + "(20)     |")
-    print("|                           |                           |")
-    print("|                           |                           |")
-    print(
-        str(board['21']) + "(21)----------------------" + str(board['22']) + "(22)----------------------" + str(board['23']) + "(23)")
+# def boardOutput(board):
+#     print(
+#         str(board['00']) + "(00)----------------------" + str(board['01']) + "(01)----------------------" + str(board['02']) + "(02)")
+#     print("|                           |                           |")
+#     print("|       " + str(board['03']) + "(03)--------------" + str(board['04']) + "(04)--------------" + str(board[
+#         '05']) + "(05)     |")
+#     print("|       |                   |                    |      |")
+#     print("|       |                   |                    |      |")
+#     print("|       |        " + str(board['06']) + "(06)-----" + str(board['07']) + "(07)-----" + str(board[
+#         '08']) + "(08)       |      |")
+#     print("|       |         |                   |          |      |")
+#     print("|       |         |                   |          |      |")
+#     print(str(board['09']) + "(09)---" + str(board['10']) + "(10)----" + str(board['11']) + "(11)               " + str(board[
+#         '12']) + "(12)----" + str(board['13']) + "(13)---" + str(board['14']) + "(14)")
+#     print("|       |         |                   |          |      |")
+#     print("|       |         |                   |          |      |")
+#     print("|       |        " + str(board['15']) + "(15)-----" + str(board['16']) + "(16)-----" + str(board[
+#         '17']) + "(17)       |      |")
+#     print("|       |                   |                    |      |")
+#     print("|       |                   |                    |      |")
+#     print("|       " + str(board['18']) + "(18)--------------" + str(board['19']) + "(19)--------------" + str(board[
+#         '20']) + "(20)     |")
+#     print("|                           |                           |")
+#     print("|                           |                           |")
+#     print(
+#         str(board['21']) + "(21)----------------------" + str(board['22']) + "(22)----------------------" + str(board['23']) + "(23)")
 
 
 # เริ่มphase1
-def autoPhase1():
-    global round
-    for round in range(9):
-        print("round ", round + 1)
-        for i in range(2):
-            boardOutput(board)
-            while (True):
-                cdn = randomPlace()
-                if placeable(i, str(cdn)):
-                    break
-            placePawn(i + 1, str(cdn))
-            if checkMill(i + 1, str(cdn)):
-                if i == 0:
-                    autoDelete(2)
-                else:
-                    autoDelete(1)
-    print("This is the end of phase 1")
+# def autoPhase1():
+#     global round
+#     for round in range(9):
+#         print("round ", round + 1)
+#         for i in range(2):
+#             # boardOutput(board)
+#             while (True):
+#                 cdn = randomPlace()
+#                 if placeable(i, str(cdn)):
+#                     break
+#             placePawn(i + 1, str(cdn))
+#             if checkMill(i + 1, str(cdn)):
+#                 if i == 0:
+#                     autoDelete(2)
+#                 else:
+#                     autoDelete(1)
+#     print("This is the end of phase 1")
 
 
-def phase1():
-    global round
-    for round in range(9):
-        print("round ", round + 1)
-        for i in range(2):
-            boardOutput(board)
-            while (True):
-                cdn = input("Please input cdn: ")
-                if str(cdn) in board:
-                    if board[str(cdn)] == 'X':
-                        break
-                    else:
-                        print(
-                            "The pawn has already placed on this cdn, please place on another cdn.")
-            placePawn(str(i + 1), str(cdn))
-            if checkMill(str(i + 1), str(cdn)):
-                if i == 0:
-                    delete("2")
-                else:
-                    delete("1")
-    print("This is the end of phase 1")
+# def phase1():
+#     global round
+#     for round in range(9):
+#         print("round ", round + 1)
+#         for i in range(2):
+#             # boardOutput(board)
+#             while (True):
+#                 cdn = input("Please input cdn: ")
+#                 if str(cdn) in board:
+#                     if board[str(cdn)] == 'X':
+#                         break
+#                     else:
+#                         print(
+#                             "The pawn has already placed on this cdn, please place on another cdn.")
+#             placePawn(str(i + 1), str(cdn))
+#             if checkMill(str(i + 1), str(cdn)):
+#                 if i == 0:
+#                     delete("2")
+#                 else:
+#                     delete("1")
+#     print("This is the end of phase 1")
 
 
-# เริ่มphase2
-def phase2():
-    global round, phase3EndFlag, phase3StartFlag, player1Phase3Flag
-    round += 1
-    print("Welcome to Phase 2 of the game!")
-    print("You can now move the pawn in the board next to their starting point.")
-    print("Same rule applies.")
-    while (True):
-        round += 1
-        print("round", round)
-        for i in range(2):
-            if player1Phase3Flag:
-                player1Phase3Flag = False
-                continue
-            boardOutput(board)
-            while (True):
-                print("player ", i + 1, " turn")
-                st = input("Plase input starting point: ")
-                end = input("Please input ending point: ")
-                if str(st) in board and str(end) in board and board[st] == str(i + 1) and board[end] == "X":
-                    break
-                else:
-                    print("Invalid coordinate, please check your input.")
-            move(str(i + 1), str(st), str(end))
-            if checkMill(str(i + 1), str(end)):
-                if i == 0:
-                    delete("2")
-                else:
-                    delete("1")
-            if phase3StartFlag and phase3EndFlag == False:
-                if i == 0:
-                    phase3("2")
-                    phase3EndFlag = True
-                    break
-                else:
-                    phase3("1")
-                    phase3EndFlag = True
-                    player1Phase3Flag = True
-            elif endGameFlag:
-                break
-        if endGameFlag:
-            break
-    print("This game has ended!")
-    print("Congrats to player ", i + 1)
+# # เริ่มphase2
+# def phase2():
+#     global round, phase3EndFlag, phase3StartFlag, player1Phase3Flag
+#     round += 1
+#     print("Welcome to Phase 2 of the game!")
+#     print("You can now move the pawn in the board next to their starting point.")
+#     print("Same rule applies.")
+#     while (True):
+#         round += 1
+#         print("round", round)
+#         for i in range(2):
+#             if player1Phase3Flag:
+#                 player1Phase3Flag = False
+#                 continue
+#             # boardOutput(board)
+#             while (True):
+#                 print("player ", i + 1, " turn")
+#                 st = input("Plase input starting point: ")
+#                 end = input("Please input ending point: ")
+#                 if str(st) in board and str(end) in board and board[st] == str(i + 1) and board[end] == "X":
+#                     break
+#                 else:
+#                     print("Invalid coordinate, please check your input.")
+#             move(str(i + 1), str(st), str(end))
+#             if checkMill(str(i + 1), str(end)):
+#                 if i == 0:
+#                     delete("2")
+#                 else:
+#                     delete("1")
+#             if phase3StartFlag and phase3EndFlag == False:
+#                 if i == 0:
+#                     phase3("2")
+#                     phase3EndFlag = True
+#                     break
+#                 else:
+#                     phase3("1")
+#                     phase3EndFlag = True
+#                     player1Phase3Flag = True
+#             elif endGameFlag:
+#                 break
+#         if endGameFlag:
+#             break
+#     print("This game has ended!")
+#     print("Congrats to player ", i + 1)
 
 
-def autoPhase2():
-    global round, phase3EndFlag, phase3StartFlag, player1Phase3Flag
-    round += 1
-    print("Welcome to Phase 2 of the game!")
-    print("You can now move the pawn in the board next to their starting point.")
-    print("Same rule applies.")
-    while (True):
-        round += 1
-        print("round", round)
-        for i in range(2):
-            if player1Phase3Flag:
-                player1Phase3Flag = False
-                continue
-            boardOutput(board)
-            while (True):
-                st, end = randomMove(i + 1)
-                print(st, end)
-                if movable(i + 1, str(st), str(end)):
-                    break
-            move(i + 1, str(st), str(end))
-            if checkMill(i + 1, str(end)):
-                if i == 0:
-                    autoDelete(2)
-                else:
-                    autoDelete(1)
-            if phase3StartFlag and phase3EndFlag == False:
-                if i == 0:
-                    autoPhase3(2)
-                    phase3EndFlag = True
-                    break
-                else:
-                    autoPhase3(1)
-                    phase3EndFlag = True
-                    player1Phase3Flag = True
-            elif endGameFlag:
-                break
-        if endGameFlag:
-            break
-    boardOutput(board)
-    print("This game has ended!")
-    print("Congrats to player ", i + 1)
+# def autoPhase2():
+#     global round, phase3EndFlag, phase3StartFlag, player1Phase3Flag
+#     round += 1
+#     print("Welcome to Phase 2 of the game!")
+#     print("You can now move the pawn in the board next to their starting point.")
+#     print("Same rule applies.")
+#     while (True):
+#         round += 1
+#         print("round", round)
+#         for i in range(2):
+#             if player1Phase3Flag:
+#                 player1Phase3Flag = False
+#                 continue
+#             # boardOutput(board)
+#             while (True):
+#                 st, end = randomMove(i + 1)
+#                 print(st, end)
+#                 if movable(i + 1, str(st), str(end)):
+#                     break
+#             move(i + 1, str(st), str(end))
+#             if checkMill(i + 1, str(end)):
+#                 if i == 0:
+#                     autoDelete(2)
+#                 else:
+#                     autoDelete(1)
+#             if phase3StartFlag and phase3EndFlag == False:
+#                 if i == 0:
+#                     autoPhase3(2)
+#                     phase3EndFlag = True
+#                     break
+#                 else:
+#                     autoPhase3(1)
+#                     phase3EndFlag = True
+#                     player1Phase3Flag = True
+#             elif endGameFlag:
+#                 break
+#         if endGameFlag:
+#             break
+#     # boardOutput(board)
+#     print("This game has ended!")
+#     print("Congrats to player ", i + 1)
 
 
-# เริ่มphase 3พร้อมบอกว่า playerคนไหนเข้ามา
-def phase3(player):
-    global round
-    round += 1
-    print("Welcome to Phase 3 of the game!")
-    print("You can now move the pawn in the board in any coordinate that's still an empty spot for one move.")
-    print("Same rule applies.")
-    print("round", round)
-    boardOutput(board)
-    while (True):
-        st = input("Plase input starting point: ")
-        end = input("Please input ending point: ")
-        if str(st) in board and str(end) in board and board[st] == str(player) and board[end] == "X":
-            break
-        else:
-            print("Invalid coordinate, please check your input.")
-    jump(str(player), str(st), str(end))
-    if checkMill(str(player), str(end)):
-        if player == "1":
-            delete("2")
-        else:
-            delete("1")
+# # เริ่มphase 3พร้อมบอกว่า playerคนไหนเข้ามา
+# def phase3(player):
+#     global round
+#     round += 1
+#     print("Welcome to Phase 3 of the game!")
+#     print("You can now move the pawn in the board in any coordinate that's still an empty spot for one move.")
+#     print("Same rule applies.")
+#     print("round", round)
+#     # boardOutput(board)
+#     while (True):
+#         st = input("Plase input starting point: ")
+#         end = input("Please input ending point: ")
+#         if str(st) in board and str(end) in board and board[st] == str(player) and board[end] == "X":
+#             break
+#         else:
+#             print("Invalid coordinate, please check your input.")
+#     jump(str(player), str(st), str(end))
+#     if checkMill(str(player), str(end)):
+#         if player == "1":
+#             delete("2")
+#         else:
+#             delete("1")
 
 
-def autoPhase3(player):
-    global round
-    round += 1
-    print("Welcome to Phase 3 of the game!")
-    print("You can now move the pawn in the board in any coordinate that's still an empty spot for one move.")
-    print("Same rule applies.")
-    print("round", round)
-    boardOutput(board)
-    while (True):
-        st, end = randomJump(player)
-        if str(st) in board and str(end) in board and board[st] == player and board[end] == 3:
-            break
-    jump(player, str(st), str(end))
-    if checkMill(str(player), str(end)):
-        if player == 1:
-            autoDelete(2)
-        else:
-            autoDelete(1)
+# def autoPhase3(player):
+#     global round
+#     round += 1
+#     print("Welcome to Phase 3 of the game!")
+#     print("You can now move the pawn in the board in any coordinate that's still an empty spot for one move.")
+#     print("Same rule applies.")
+#     print("round", round)
+#     # boardOutput(board)
+#     while (True):
+#         st, end = randomJump(player)
+#         if str(st) in board and str(end) in board and board[st] == player and board[end] == 3:
+#             break
+#     jump(player, str(st), str(end))
+#     if checkMill(str(player), str(end)):
+#         if player == 1:
+#             autoDelete(2)
+#         else:
+#             autoDelete(1)
 
 
-def main():
-    # phase1()
-    # phase2()
-    autoPhase1()
-    autoPhase2()
+# def main():
+#     # phase1()
+#     # phase2()
+#     autoPhase1()
+#     autoPhase2()

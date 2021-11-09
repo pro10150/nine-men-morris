@@ -13,7 +13,7 @@ import pygame.freetype
 import re
 import random
 
-waittime = 0.2
+waittime = 0.1
 
 
 def draw_board():
@@ -35,9 +35,9 @@ def draw_board():
         for c in range(COLS):
             radius = RADIUS
             color2 = WHITE
-            if (int(CURRENTBOARDPOSITION[r][c]) == PLAY1):
+            if (int(CURRENTBOARDPOSITION[r][c]) == PLAY1):  # p1 is red
                 (color2, radius) = (RED, radius)
-            elif (int(CURRENTBOARDPOSITION[r][c]) == PLAY2):
+            elif (int(CURRENTBOARDPOSITION[r][c]) == PLAY2):  # p2 is blue
                 (color2, radius) = (BLUE, radius)
             elif (int(BOARDPOSTION[r][c] == VALID)):
                 radius = int(RADIUS / 2)
@@ -55,9 +55,9 @@ def mainAutoPhase1():
     global round
     for round in range(9):
         time.sleep(waittime)
-        print("round ", round + 1)
+        # print("round ", round + 1)
         for i in range(2):  # i = 0 is player 1, i = 1 is player 2
-            print("Player " + str(i+1) + " round")
+            # print("Player " + str(i+1) + " round")
             draw_board()
             pygame.display.update()
             while (True):
@@ -65,11 +65,9 @@ def mainAutoPhase1():
                 if i == 0:
                     cdn = randomPlace()  # using random ai
                 else:
-                    # cdn = randomPlace()  # TODO: using algorithm
-                    # maxing the ai first
-                    # _, cdn, _ = ai_step(
-                    # board, i + 1, pawnToPlace[2], pawnToPlace[1])
-                    cdn = randomPlace()
+                    # using algorithm
+                    _, cdn, remov = ai_step(
+                        board, i + 1, pawnToPlace[2], pawnToPlace[1])
 
                 if placeable(i, cdn):  # only check if placeable
                     break
@@ -80,7 +78,7 @@ def mainAutoPhase1():
                 if i == 0:
                     autoDelete(2)  # using random ai
                 else:
-                    autoDelete(1)  # using algorithm
+                    targetedDelete(1, remov)  # using algorithm
 
     print("This is the end of phase 1")
 
@@ -96,14 +94,14 @@ def mainAutoPhase2():
 
     while (True):
         round += 1
-        print("round " + str(round))
+        # print("round " + str(round))
 
         time.sleep(waittime)
         draw_board()
         pygame.display.update()
 
         for i in range(2):
-            print("Player " + str(i+1) + " round")
+            # print("Player " + str(i+1) + " round")
             if player1Phase3Flag:
                 player1Phase3Flag = False
                 continue
@@ -115,19 +113,20 @@ def mainAutoPhase2():
                 if i == 0:
                     st, end = randomMove(i + 1)  # using random ai
                 else:
-                    st, end = randomMove(i + 1)  # TODO: using algorithm
+                    # using algorithm
+                    st, end, remov = ai_step(
+                        board, i + 1, pawnToPlace[2], pawnToPlace[1])
 
                 if movable(i + 1, st, end):
                     break
 
-            print(st, end)
             move(i + 1, st, end)
 
             if checkMill(i + 1, end):
                 if i == 0:
                     autoDelete(2)  # using random ai
                 else:
-                    autoDelete(1)  # using algorithm
+                    targetedDelete(1, remov)  # using algorithm
 
             if phase3StartFlag and phase3EndFlag == False:
                 if i == 0:
@@ -166,7 +165,9 @@ def mainAutoPhase3(player):
         if player == 1:
             st, end = randomJump(player)  # using randomness
         else:
-            st, end = randomJump(player)  # using algorithm
+            # using algorithm
+            st, end, remov = ai_step(
+                board, player, pawnToPlace[2], pawnToPlace[1])
         if st in board and end in board and board[st] == player and board[end] == 3:
             break
     jump(player, st, end)
@@ -174,7 +175,7 @@ def mainAutoPhase3(player):
         if player == 1:
             autoDelete(2)  # using randomness
         else:
-            autoDelete(1)  # using algorithm
+            targetedDelete(1, remov)  # using algorithm
 
 
 def main():

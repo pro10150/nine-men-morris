@@ -10,7 +10,7 @@ new_board = np.zeros(24)
 
 
 def ai_step(board, side, my_piece, their_piece):
-    depth = 3  # depth 3 is too much for my computer
+    depth = 2  # depth 3 is too much for my computer
     best_score = -999999
 
     move = -1
@@ -18,6 +18,8 @@ def ai_step(board, side, my_piece, their_piece):
     remove = -1
     # print('The current board is...')
     # print(board)
+    # the best board must iterate backwards
+
     best_board, _, reward, end_state = minimaxAB(
         board, side, depth, my_piece, their_piece)
 

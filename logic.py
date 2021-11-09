@@ -227,7 +227,10 @@ def autoDelete(player):
 def targetedDelete(player, cdn):
     print("You connected 3 straight point and can remove one of oppoents pawn!")
     if deletable(player, cdn):
-        deletePawn(player, cdn)
+        if board[cdn] == 3:  # Failsafe
+            autoDelete(player)
+        else:
+            deletePawn(player, cdn)
 
 
 def randomPlace():

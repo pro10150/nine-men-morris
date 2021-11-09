@@ -87,6 +87,7 @@ def mainAutoPhase1():
 
 def mainAutoPhase2():
     global round, phase3EndFlag, phase3StartFlag, player1Phase3Flag
+    istie = False
     round += 1
     print("Welcome to Phase 2 of the game!")
     print("You can now move the pawn in the board next to their starting point.")
@@ -117,6 +118,10 @@ def mainAutoPhase2():
                     st, end, remov = ai_step(
                         board, i + 1, pawnToPlace[2], pawnToPlace[1])
 
+                    if end == -1:
+                        print('FAILSAFE ACTIVE')
+                        st, end = randomMove(i + 1)  # FAILSAFE
+
                 if movable(i + 1, st, end):
                     break
 
@@ -140,6 +145,9 @@ def mainAutoPhase2():
             elif playerPawn[1] == 2 or playerPawn[2] == 2:
                 break
 
+        if round > 99:  # END THE GAME WITH TIE
+            istie = True
+            break
         if playerPawn[1] == 2 or playerPawn[2] == 2:  # END THE GAME
             break
     print("YEET")
@@ -148,7 +156,11 @@ def mainAutoPhase2():
     draw_board()
     pygame.display.update()
     print("This game has ended!")
-    print("Congrats to player ", i + 1)
+    if istie:
+        print("It's a tie")
+    else:
+        print("Congrats to player ", i + 1)
+    print("Round : ", round)
 
 
 def mainAutoPhase3(player):
@@ -168,6 +180,10 @@ def mainAutoPhase3(player):
             # using algorithm
             st, end, remov = ai_step(
                 board, player, pawnToPlace[2], pawnToPlace[1])
+
+            if end == -1:
+                print('FAILSAFE ACTIVE')
+                st, end = randomMove(player)  # FAILSAFE
         if st in board and end in board and board[st] == player and board[end] == 3:
             break
     jump(player, st, end)

@@ -1,6 +1,5 @@
 # Based on the code from https://github.com/S7uXN37/NineMensMorrisBoard
 import numpy as np
-from ai_copy import opposite_player
 import logic
 
 WIN_REWARD = 2.0
@@ -11,32 +10,35 @@ new_board = np.zeros(24)
 
 def ai_step(board, side, my_piece, their_piece):
     depth = 2  # depth 3 is too much for my computer
-    best_score = -999999
+    # best_score = -999999
 
+    base_step_board = board.copy()
+
+    step_number = 0
     move = -1
     place = -1
     remove = -1
     # print('The current board is...')
     # print(board)
-    # the best board must iterate backwards
+    # the best board must iterate backwards to 'the next board'
 
-    best_board, _, reward, end_state = minimaxAB(
-        board, side, depth, my_piece, their_piece)
+    best_board, _, reward, end_state, step_board = minimaxAB(
+        board, side, depth, my_piece, their_piece, step_number, base_step_board)
 
     # print('The best board is...')
     # print(best_board)
 
     # compares current board and the best board then extracts move indices
     for i in range(24):
-        print(board[i], best_board[i])
+        print(board[i], step_board[i])
         # move (leaving the starting spot empty)
-        if board[i] == side and best_board[i] == 3:
+        if board[i] == side and step_board[i] == 3:
             move = i
         # placing in an empty space
-        if board[i] == 3 and best_board[i] == side:
+        if board[i] == 3 and step_board[i] == side:
             place = i
         # remove the opponent
-        if board[i] == swap(side) and best_board[i] == 3:
+        if board[i] == swap(side) and step_board[i] == 3:
             print('AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA')
             remove = i
 
@@ -47,15 +49,15 @@ def ai_step(board, side, my_piece, their_piece):
     return move, place, remove
 
 
-def minimaxAB(board, side, depth, my_piece, their_piece):
+def minimaxAB(board, side, depth, my_piece, their_piece, step_number, step_board):
 
     if depth <= 0:
         # and evaluate boards
-        return board, eval_board(board, side=side) - eval_board(board, side=-side), 0, False
+        return board, eval_board(board, side=side) - eval_board(board, side=swap(side)), 0, False, step_board
     else:
 
-        if type(board) == list:
-            board = np.asarray(board)
+        step_n = step_number + 1
+        base_step_board = [0] * 24
 
         worst_their_score = 999999  # want to get this as low as possible
         best_board = board  # initialize the board
@@ -63,48 +65,61 @@ def minimaxAB(board, side, depth, my_piece, their_piece):
         reward = -WIN_REWARD  # base reward if no possible moves
         end_state = True
 
+        # each board_f has its own 'next step from the current board' value
         for board_f in moves(board, side, my_piece):
 
+            if step_n == 1:  # get the current board
+                base_step_board = board_f
+            elif step_n == 2:
+                base_step_board = step_board
+            else:
+                base_step_board = step_board
+            # print(board)
+            # print(base_step_board)
+
             # minimizes the opponent, and swap role
-            _, their_score, _, _ = minimaxAB(
-                board_f, swap(side), depth-1, their_piece, my_piece-1)
+            _, their_score, _, _, step_board = minimaxAB(
+                board_f, swap(side), depth-1, their_piece, my_piece-1, step_n, base_step_board)
 
             temp_reward = 0
             temp_end_state = False
-
             # not to be confused with my_piece, their_piece
-            # these variables belowcount how much pieces left for each side
-            pieces_mine = len(board_f[board_f == side])
-            pieces_theirs = len(board_f[board_f == swap(side)])
+            # these variables below count how much pieces left for each side
+            pieces_mine = board_f.count(side)
+            pieces_theirs = board_f.count(swap(side))
             if pieces_mine < 3 and my_piece <= 0:
                 temp_reward = -WIN_REWARD  # Don't lose...
                 temp_end_state = True
             elif pieces_theirs < 3 and their_piece <= 0:
                 temp_reward = WIN_REWARD  # I win.
                 temp_end_state = True
-            elif pieces_theirs < len(board[board == swap(side)]):
+            elif pieces_theirs < board.count(swap(side)):
                 temp_reward = CAPTURE_REWARD  # Let's capture.
-            elif pieces_mine < len(board[board == side]):
+            elif pieces_mine < board.count(side):
                 temp_reward = -CAPTURE_REWARD  # Avoid being captured again.
 
             # outputs these variables with best board for ai
             # also gets the value advantage as well
-            if (their_score < worst_their_score) or temp_reward == WIN_REWARD:
+            if (their_score < worst_their_score) or temp_reward == WIN_REWARD:  # good target
+
                 best_board = board_f
                 worst_their_score = their_score
                 reward = temp_reward
                 end_state = temp_end_state
-            if temp_reward == WIN_REWARD:  # I found the winning board so PRUNE it
+            if temp_reward == WIN_REWARD:  # I found the good board so PRUNE it
                 break
 
-        return best_board, -worst_their_score, reward, end_state
+        print('BOARD for step ' + str(step_n))
+        print(board)
+        print(base_step_board)
+        return best_board, -worst_their_score, reward, end_state, base_step_board
 
 
 def moves(board, side, my_piece):
 
     global new_board
 
-    board_list = np.array([], dtype=np.int16)  # stores all the legal boards
+    board_list = []
 
     if my_piece > 0:  # I am in PHASE 1
 
@@ -115,13 +130,13 @@ def moves(board, side, my_piece):
 
             # find capturable pieces if it forms a mill
             if checkMillWithBoard(new_board, side, i):
-                board_list = np.append(
-                    board_list, capturables(new_board, side))
+                for x in capturables(new_board, side):
+                    board_list.append(x)
             # Or just simply add the board to the list
             else:
-                board_list = np.append(board_list, new_board)
+                board_list.append(new_board)
 
-    elif len(board[board == side]) > 3:  # I am in PHASE 2
+    elif board.count(side) > 3:  # I am in PHASE 2
 
         # get own pieces then find possible moves
         for i, value in enumerate(board):
@@ -135,11 +150,11 @@ def moves(board, side, my_piece):
 
                         # find capturable pieces if it forms a mill
                         if checkMillWithBoard(new_board, side, i):
-                            board_list = np.append(
-                                board_list, capturables(new_board, side))
+                            for x in capturables(new_board, side):
+                                board_list.append(x)
                         # Or just simply add the board to the list
                         else:
-                            board_list = np.append(board_list, new_board)
+                            board_list.append(new_board)
 
     else:  # I am in PHASE 3 darn it
 
@@ -155,32 +170,30 @@ def moves(board, side, my_piece):
 
                         # find capturable pieces if it forms a mill
                         if checkMillWithBoard(new_board, side, i):
-                            board_list = np.append(
-                                board_list, capturables(new_board, side))
+                            for x in capturables(new_board, side):
+                                board_list.append(x)
+                        # Or just simply add the board to the list
                         else:
-                            board_list = np.append(board_list, new_board)
+                            board_list.append(new_board)
 
-    num_moves = int(len(board_list)/24)
-    #print('calculated %d possible moves:' % num_moves)
-    # print(board_list)
-    # print(type(board_list))
-    # print(board_list.reshape(num_moves, 24))
-    return board_list.reshape(num_moves, 24)
+    # add the step_board to the board_list
+
+    return board_list
 
 
 def capturables(board, side):
-    legal = np.array([], dtype=np.int16)  # array of enemy nodes outside mill
+    legal = []  # array of enemy nodes outside mill
     # enemy nodes inside mill, uncapturable
-    illegal = np.array([], dtype=np.int16)
+    illegal = []
     for i, value in enumerate(board):
         if value == swap(side):
             new_board = [va for va in board]
             new_board[i] = 3
             # add em to the list
             if checkMillWithBoard(board, swap(side), i):
-                illegal = np.append(illegal, new_board)
+                illegal.append(new_board)
             else:
-                legal = np.append(legal, new_board)
+                legal.append(new_board)
     if len(legal) <= 0:  # No legal piece? just use the illegal list
         return illegal
     else:

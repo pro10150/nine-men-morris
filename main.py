@@ -118,9 +118,10 @@ def mainAutoPhase2():
                     st, end, remov = ai_step(
                         board, i + 1, pawnToPlace[2], pawnToPlace[1])
 
-                    if end == -1:
+                    if end == -1 or st == -1:
                         print('FAILSAFE ACTIVE')
-                        st, end = randomMove(i + 1)  # FAILSAFE
+                        # FAILSAFE WHEN EITHER IS INVALID
+                        st, end = randomMove(i + 1)
 
                 if movable(i + 1, st, end):
                     break

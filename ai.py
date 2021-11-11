@@ -102,8 +102,6 @@ def minimaxAB(board, side, depth, my_piece, their_piece):
         # print(board)
         # print(best_board)
 
-        print()
-
         return best_board, -worst_their_score, end_state
 
 

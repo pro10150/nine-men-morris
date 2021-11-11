@@ -1,8 +1,9 @@
 # Based on the code from https://github.com/S7uXN37/NineMensMorrisBoard
 import numpy as np
+from numpy.lib.type_check import mintypecode
 import logic
 
-AI_WON = 1
+WIN_REWARD = 2.0
 CAPTURE_REWARD = 0.3
 
 new_board = np.zeros(24)
@@ -22,110 +23,154 @@ def ai_step(board, side, my_piece, their_piece):
     # print(board)
     # the best board must iterate backwards to 'the next board'
 
-    best_board, worst_score, end_state, step_board = minimaxAB(
-        board, side, depth, my_piece, their_piece, step_number, base_step_board)
+    best_board, worst_score, reward, end_state, step_board = minimaxAB(
+        board, side, depth, my_piece, their_piece, True, -999999, 999999)
 
-    print('The best board is...')
-    print(best_board)
+    # print('The best board is...')
+    # print(best_board)
 
-    print('The board to step next is...')
-    print(step_board)
-
-    print('With the worst score of ...')
-    print(worst_score)
-
-    # print('Worst score: ' + str(worst_score))
+    print('Worst score: ' + str(worst_score))
     # compares current board and the best board then extracts move indices
     for i in range(24):
-        # print(board[i], step_board[i])
+        print(board[i], best_board[i])
         # move (leaving the starting spot empty)
-        if board[i] == side and step_board[i] == 3:
+        if board[i] == side and best_board[i] == 3:
             move = i
         # placing in an empty space
-        if board[i] == 3 and step_board[i] == side:
+        if board[i] == 3 and best_board[i] == side:
             place = i
         # remove the opponent
-        if board[i] == swap(side) and step_board[i] == 3:
+        if board[i] == swap(side) and best_board[i] == 3:
             print('AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA')
             remove = i
 
-    print('Move: ' + str(move))
-    print('Place: ' + str(place))
-    print('Delete: ' + str(remove))
+    # print('Move: ' + str(move))
+    # print('Place: ' + str(place))
+    # print('Delete: ' + str(remove))
 
     return move, place, remove
 
 
-def minimaxAB(board, side, depth, my_piece, their_piece, step_number, step_board):
+def minimaxAB(board, side, depth, my_piece, their_piece, maxxing_mode, alpha, beta):
 
     if depth <= 0:
         # and evaluate boards
+        # print(eval_board(board, side=side))
+        # print(-eval_board(board, side=swap(side)))
         advantage = eval_board(board, side=side) - \
             eval_board(board, side=swap(side))
 
-        print(advantage)
-        # print(board)
-        # print(eval_board(board, side=side))
-        # print(-eval_board(board, side=swap(side)))
-        # print(advantage, ' for player ', side)
+        print(depth, advantage)
 
-        return board, advantage, False, step_board
+        return board, advantage, 0, False
     else:
-
-        step_n = step_number + 1
-        base_step_board = [0] * 24
-
-        worst_their_score = 999999  # want to get this as low as possible
         best_board = board  # initialize the board
-
         end_state = True
 
-        # each board_f has its own 'next step from the current board' value
-        for board_f in moves(board, side, my_piece):
+        if maxxing_mode == True:
+            best_value = -999999
+            # list every possible for the player and all next steps
+            for board_f in moves(board, side, my_piece):
 
-            if step_n == 1:  # get the current board
-                base_step_board = board_f
-            elif step_n == 2:
-                base_step_board = step_board
-            else:
-                base_step_board = step_board
-            # print(board)
-            # print(base_step_board)
+                # if step_n == 1:  # get the current board
+                #     base_step_board = board_f
+                # elif step_n == 2:
+                #     base_step_board = step_board
+                # else:
+                #     base_step_board = step_board
+                # print(board)
+                # print(base_step_board)
 
-            # minimizes the opponent, and swap role
-            _, their_score, _, step_board = minimaxAB(
-                board_f, swap(side), depth-1, their_piece, my_piece-1, step_n, base_step_board)
+                # minimizes the opponent, and swap role
+                _, their_score, _, _ = minimaxAB(
+                    board_f, swap(side), depth-1, their_piece, my_piece-1, False, alpha, beta)
 
-            temp_reward = 0
-            temp_end_state = False
-            # not to be confused with my_piece, their_piece
-            # these variables below count how much pieces left for each side
-            pieces_mine = board_f.count(side)
-            pieces_theirs = board_f.count(swap(side))
-            if pieces_mine < 3 and my_piece <= 0:
-                temp_reward = -AI_WON  # Don't lose...
-                temp_end_state = True
-            elif pieces_theirs < 3 and their_piece <= 0:
-                temp_reward = AI_WON  # I win.
-                temp_end_state = True
+                best_value = max(best_value, their_score)
+                alpha = max(alpha, best_value)
 
-            # outputs these variables with best board for ai
-            # also gets the value advantage as well
-            if (their_score < worst_their_score) or temp_reward == AI_WON:  # good target
+                temp_reward = 0
+                temp_end_state = False
+                # not to be confused with my_piece, their_piece
+                # these variables below count how much pieces left for each side
+                pieces_mine = board_f.count(side)
+                pieces_theirs = board_f.count(swap(side))
+                if pieces_mine < 3 and my_piece <= 0:
+                    temp_reward = -WIN_REWARD  # Don't lose...
+                    temp_end_state = True
+                elif pieces_theirs < 3 and their_piece <= 0:
+                    temp_reward = WIN_REWARD  # I win.
+                    temp_end_state = True
+                elif pieces_theirs < board.count(swap(side)):
+                    temp_reward = CAPTURE_REWARD  # Let's capture.
+                elif pieces_mine < board.count(side):
+                    # Avoid being captured again.
+                    temp_reward = -CAPTURE_REWARD
 
-                best_board = board_f
-                worst_their_score = their_score
-                end_state = temp_end_state
-            if temp_reward == AI_WON:  # I found the good board so PRUNE it
-                break
+                # outputs these variables with best board for ai
+                # also gets the value advantage as well
+                if (beta <= alpha) or temp_reward == WIN_REWARD:  # good target
+
+                    best_board = board_f
+                    worst_their_score = their_score
+                    reward = temp_reward
+                    end_state = temp_end_state
+                    break
+
+        elif maxxing_mode == False:
+            best_value = 999999
+            # list every possible for the player and all next steps
+            for board_f in moves(board, side, my_piece):
+
+                # if step_n == 1:  # get the current board
+                #     base_step_board = board_f
+                # elif step_n == 2:
+                #     base_step_board = step_board
+                # else:
+                #     base_step_board = step_board
+                # print(board)
+                # print(base_step_board)
+
+                # minimizes the opponent, and swap role
+                _, their_score, _, _ = minimaxAB(
+                    board_f, swap(side), depth-1, their_piece, my_piece-1, True, alpha, beta)
+
+                best_value = min(best_value, their_score)
+                beta = min(beta, best_value)
+
+                temp_reward = 0
+                temp_end_state = False
+                # not to be confused with my_piece, their_piece
+                # these variables below count how much pieces left for each side
+                pieces_mine = board_f.count(side)
+                pieces_theirs = board_f.count(swap(side))
+                if pieces_mine < 3 and my_piece <= 0:
+                    temp_reward = -WIN_REWARD  # Don't lose...
+                    temp_end_state = True
+                elif pieces_theirs < 3 and their_piece <= 0:
+                    temp_reward = WIN_REWARD  # I win.
+                    temp_end_state = True
+                elif pieces_theirs < board.count(swap(side)):
+                    temp_reward = CAPTURE_REWARD  # Let's capture.
+                elif pieces_mine < board.count(side):
+                    # Avoid being captured again.
+                    temp_reward = -CAPTURE_REWARD
+
+                # outputs these variables with best board for ai
+                # also gets the value advantage as well
+                if (beta <= alpha) or temp_reward == WIN_REWARD:  # good target
+
+                    best_board = board_f
+                    worst_their_score = their_score
+                    reward = temp_reward
+                    end_state = temp_end_state
+                    break
 
         # print('BOARD for step ' + str(step_n))
         # print(board)
         # print(base_step_board)
         # print(best_board)
-        # print('their score', their_score)
         # print('reward is ' + str(reward))
-        return best_board, -worst_their_score, end_state, base_step_board
+        return best_board, -worst_their_score, reward, end_state
 
 
 def moves(board, side, my_piece):

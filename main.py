@@ -13,7 +13,7 @@ import pygame.freetype
 import re
 import random
 
-waittime = 0.1
+waittime = 1
 
 
 def draw_board():

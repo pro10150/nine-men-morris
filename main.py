@@ -13,7 +13,7 @@ import pygame.freetype
 import re
 import random
 
-waittime = 1
+waittime = 0.2
 
 
 def draw_board():
@@ -97,7 +97,6 @@ def mainAutoPhase2():
         round += 1
         # print("round " + str(round))
 
-        time.sleep(waittime)
         draw_board()
         pygame.display.update()
 
@@ -114,6 +113,7 @@ def mainAutoPhase2():
                 if i == 0:
                     st, end = randomMove(i + 1)  # using random ai
                 else:
+
                     # using algorithm
                     st, end, remov = ai_step(
                         board, i + 1, pawnToPlace[2], pawnToPlace[1])
@@ -129,6 +129,7 @@ def mainAutoPhase2():
             move(i + 1, st, end)
 
             if checkMill(i + 1, end):
+                time.sleep(waittime)
                 if i == 0:
                     autoDelete(2)  # using random ai
                 else:

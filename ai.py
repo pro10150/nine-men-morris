@@ -12,9 +12,6 @@ def ai_step(board, side, my_piece, their_piece):
     depth = 2  # depth 3 is too much for my computer
     # best_score = -999999
 
-    base_step_board = board.copy()
-
-    step_number = 0
     move = -1
     place = -1
     remove = -1
@@ -22,30 +19,29 @@ def ai_step(board, side, my_piece, their_piece):
     # print(board)
     # the best board must iterate backwards to 'the next board'
 
-    best_board, worst_score, end_state, step_board = minimaxAB(
-        board, side, depth, my_piece, their_piece, step_number, base_step_board)
+    best_board, worst_score, end_state = minimaxAB(
+        board, side, depth, my_piece, their_piece)
 
-    print('The best board is...')
-    print(best_board)
+    # print('The best board is...')
+    # print(best_board)
 
-    print('The board to step next is...')
-    print(step_board)
-
-    print('With the worst score of ...')
-    print(worst_score)
+    # print('With the worst score of ...')
+    # print(worst_score)
 
     # print('Worst score: ' + str(worst_score))
     # compares current board and the best board then extracts move indices
+    print(board)
+    print(best_board)
+
     for i in range(24):
-        # print(board[i], step_board[i])
         # move (leaving the starting spot empty)
-        if board[i] == side and step_board[i] == 3:
+        if board[i] == side and best_board[i] == 3:
             move = i
         # placing in an empty space
-        if board[i] == 3 and step_board[i] == side:
+        if board[i] == 3 and best_board[i] == side:
             place = i
         # remove the opponent
-        if board[i] == swap(side) and step_board[i] == 3:
+        if board[i] == swap(side) and best_board[i] == 3:
             print('AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA')
             remove = i
 
@@ -56,45 +52,28 @@ def ai_step(board, side, my_piece, their_piece):
     return move, place, remove
 
 
-def minimaxAB(board, side, depth, my_piece, their_piece, step_number, step_board):
+def minimaxAB(board, side, depth, my_piece, their_piece):
 
     if depth <= 0:
         # and evaluate boards
         advantage = eval_board(board, side=side) - \
             eval_board(board, side=swap(side))
 
-        print(advantage)
-        # print(board)
-        # print(eval_board(board, side=side))
-        # print(-eval_board(board, side=swap(side)))
-        # print(advantage, ' for player ', side)
+        # print(advantage)
 
-        return board, advantage, False, step_board
+        return board, advantage, False
     else:
 
-        step_n = step_number + 1
-        base_step_board = [0] * 24
-
         worst_their_score = 999999  # want to get this as low as possible
-        best_board = board  # initialize the board
+        best_board = board.copy()  # initialize the board
 
         end_state = True
 
-        # each board_f has its own 'next step from the current board' value
         for board_f in moves(board, side, my_piece):
 
-            if step_n == 1:  # get the current board
-                base_step_board = board_f
-            elif step_n == 2:
-                base_step_board = step_board
-            else:
-                base_step_board = step_board
-            # print(board)
-            # print(base_step_board)
-
             # minimizes the opponent, and swap role
-            _, their_score, _, step_board = minimaxAB(
-                board_f, swap(side), depth-1, their_piece, my_piece-1, step_n, base_step_board)
+            _, their_score, _ = minimaxAB(
+                board_f, swap(side), depth-1, their_piece, my_piece-1)
 
             temp_reward = 0
             temp_end_state = False
@@ -111,6 +90,7 @@ def minimaxAB(board, side, depth, my_piece, their_piece, step_number, step_board
 
             # outputs these variables with best board for ai
             # also gets the value advantage as well
+            # beta < alpha
             if (their_score < worst_their_score) or temp_reward == AI_WON:  # good target
 
                 best_board = board_f
@@ -119,13 +99,12 @@ def minimaxAB(board, side, depth, my_piece, their_piece, step_number, step_board
             if temp_reward == AI_WON:  # I found the good board so PRUNE it
                 break
 
-        # print('BOARD for step ' + str(step_n))
         # print(board)
-        # print(base_step_board)
         # print(best_board)
-        # print('their score', their_score)
-        # print('reward is ' + str(reward))
-        return best_board, -worst_their_score, end_state, base_step_board
+
+        print()
+
+        return best_board, -worst_their_score, end_state
 
 
 def moves(board, side, my_piece):
@@ -188,8 +167,6 @@ def moves(board, side, my_piece):
                         # Or just simply add the board to the list
                         else:
                             board_list.append(new_board)
-
-    # add the step_board to the board_list
 
     return board_list
 

@@ -3,35 +3,21 @@ import numpy as np
 import logic
 
 AI_WON = 1
-CAPTURE_REWARD = 0.3
 
 new_board = np.zeros(24)
 
 
 def ai_step(board, side, my_piece, their_piece):
     depth = 2  # depth 3 is too much for my computer
-    # best_score = -999999
 
     move = -1
     place = -1
     remove = -1
-    # print('The current board is...')
-    # print(board)
-    # the best board must iterate backwards to 'the next board'
 
     best_board, worst_score, end_state = minimaxAB(
         board, side, depth, my_piece, their_piece)
 
-    # print('The best board is...')
-    # print(best_board)
-
-    # print('With the worst score of ...')
-    # print(worst_score)
-
-    # print('Worst score: ' + str(worst_score))
-    # compares current board and the best board then extracts move indices
-    print(board)
-    print(best_board)
+    print('final worst score :', worst_score)
 
     for i in range(24):
         # move (leaving the starting spot empty)
@@ -44,6 +30,9 @@ def ai_step(board, side, my_piece, their_piece):
         if board[i] == swap(side) and best_board[i] == 3:
             print('AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA')
             remove = i
+
+    print(board)
+    print(best_board)
 
     print('Move: ' + str(move))
     print('Place: ' + str(place))
@@ -59,13 +48,13 @@ def minimaxAB(board, side, depth, my_piece, their_piece):
         advantage = eval_board(board, side=side) - \
             eval_board(board, side=swap(side))
 
-        # print(advantage)
+        print(advantage)
 
         return board, advantage, False
     else:
 
-        worst_their_score = 999999  # want to get this as low as possible
-        best_board = board.copy()  # initialize the board
+        worst_their_score = 999999
+        best_board = board.copy()
 
         end_state = True
 
@@ -79,11 +68,11 @@ def minimaxAB(board, side, depth, my_piece, their_piece):
             temp_end_state = False
             # not to be confused with my_piece, their_piece
             # these variables below count how much pieces left for each side
+
             pieces_mine = board_f.count(side)
             pieces_theirs = board_f.count(swap(side))
             if pieces_mine < 3 and my_piece <= 0:
                 temp_reward = -AI_WON  # Don't lose...
-                temp_end_state = True
             elif pieces_theirs < 3 and their_piece <= 0:
                 temp_reward = AI_WON  # I win.
                 temp_end_state = True
@@ -100,7 +89,8 @@ def minimaxAB(board, side, depth, my_piece, their_piece):
                 break
 
         # print(board)
-        # print(best_board)
+        print(best_board)
+        print('final score: ', -worst_their_score)
 
         return best_board, -worst_their_score, end_state
 
@@ -110,6 +100,11 @@ def moves(board, side, my_piece):
     global new_board
 
     board_list = []
+    step_actions = {
+        'move': -1,
+        'place': -1,
+        'delete': -1,
+    }
 
     if my_piece > 0:  # I am in PHASE 1
 
@@ -117,14 +112,16 @@ def moves(board, side, my_piece):
             if value == 3:  # is placeable
                 new_board = [va for va in board]  # copy a current board...
                 new_board[i] = side  # ... with my placed piece
+                step_actions['place'] = i
 
-            # find capturable pieces if it forms a mill
-            if checkMillWithBoard(new_board, side, i):
-                for x in capturables(new_board, side):
-                    board_list.append(x)
-            # Or just simply add the board to the list
-            else:
-                board_list.append(new_board)
+                # find capturable pieces if it forms a mill
+                if checkMillWithBoard(new_board, side, i):
+                    for x in capturables(new_board, side):
+                        # step_actions['delete'] = i
+                        board_list.append(x)
+                # Or just simply add the board to the list
+                else:
+                    board_list.append(new_board)
 
     elif board.count(side) > 3:  # I am in PHASE 2
 
@@ -178,10 +175,10 @@ def capturables(board, side):
             new_board = [va for va in board]
             new_board[i] = 3
             # add em to the list
-            if checkMillWithBoard(board, swap(side), i):
-                illegal.append(new_board)
-            else:
+            if checkMillWithBoard(board, swap(side), i):  # if correct.
                 legal.append(new_board)
+            else:
+                illegal.append(new_board)
     if len(legal) <= 0:  # No legal piece? just use the illegal list
         return illegal
     else:
@@ -203,6 +200,11 @@ def eval_board(board, side=1):
                 if board[space] == 3:  # empty?
                     value += 0.3
 
+                    # extra value for potential mill
+                    if checkMillWithBoard(board, side, space):
+                        print('POTENTIAL MILL FOUND FROM', i, 'TO', space)
+                        value += 10
+
             # count number of pieces mills then
             # divide by 3 rounded up
             if checkMillWithBoard(board, side, i):
@@ -211,7 +213,9 @@ def eval_board(board, side=1):
     if mills % 3 != 0:
         mills += 3 - (mills % 3)
     mills = mills / 3
-    value += (1 * mills)
+    value += (15 * mills)
+
+    print('player', side, 'has', value, 'with \t\t\t', mills, 'mills')
 
     return value
 

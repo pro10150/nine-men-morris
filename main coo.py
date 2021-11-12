@@ -66,8 +66,10 @@ def mainAutoPhase1():
                     cdn = randomPlace()  # using random ai
                 else:
                     # using algorithm
-                    _, cdn, remov = ai_step(
-                        board, i + 1, pawnToPlace[2], pawnToPlace[1])
+                    # _, cdn, remov = ai_step(
+                    #     board, i + 1, pawnToPlace[2], pawnToPlace[1])
+                    ai_step(board, i + 1, pawnToPlace[2], pawnToPlace[1])
+                    cdn = randomPlace()  # using random ai
 
                 if placeable(i, cdn):  # only check if placeable
                     break
@@ -78,7 +80,8 @@ def mainAutoPhase1():
                 if i == 0:
                     autoDelete(2)  # using random ai
                 else:
-                    targetedDelete(1, remov)  # using algorithm
+                    autoDelete(1)  # using random ai
+                    # targetedDelete(1, remov)  # using algorithm
 
     print("This is the end of phase 1")
 
@@ -115,8 +118,10 @@ def mainAutoPhase2():
                 else:
 
                     # using algorithm
-                    st, end, remov = ai_step(
-                        board, i + 1, pawnToPlace[2], pawnToPlace[1])
+                    ai_step(board, i + 1, pawnToPlace[2], pawnToPlace[1])
+                    st, end = randomMove(i + 1)
+                    # st, end, remov = ai_step(
+                    #     board, i + 1, pawnToPlace[2], pawnToPlace[1])
 
                     if end == -1 or st == -1 or (end in movablePawn[st] == False):
                         print('FAILSAFE ACTIVE')
@@ -133,7 +138,8 @@ def mainAutoPhase2():
                 if i == 0:
                     autoDelete(2)  # using random ai
                 else:
-                    targetedDelete(1, remov)  # using algorithm
+                    autoDelete(1)  # using random ai
+                    # targetedDelete(1, remov)  # using algorithm
 
             if phase3StartFlag and phase3EndFlag == False:
                 if i == 0:
@@ -180,8 +186,10 @@ def mainAutoPhase3(player):
             st, end = randomJump(player)  # using randomness
         else:
             # using algorithm
-            st, end, remov = ai_step(
-                board, player, pawnToPlace[2], pawnToPlace[1])
+            ai_step(board, player, pawnToPlace[2], pawnToPlace[1])
+            st, end = randomJump(player)
+            # st, end, remov = ai_step(
+            #     board, player, pawnToPlace[2], pawnToPlace[1])
 
             if end == -1:
                 print('FAILSAFE ACTIVE')
@@ -193,7 +201,8 @@ def mainAutoPhase3(player):
         if player == 1:
             autoDelete(2)  # using randomness
         else:
-            targetedDelete(1, remov)  # using algorithm
+            autoDelete(1)
+            # targetedDelete(1, remov)  # using algorithm
 
 
 def main():
